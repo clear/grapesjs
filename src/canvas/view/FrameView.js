@@ -254,6 +254,20 @@ export default Backbone.View.extend({
     const styles = model.get('styles');
     const { em } = config;
     const doc = this.getDoc();
+
+    // Clear edit: Inject doctype to force standards mode
+    doc.open();
+
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+        <head></head>
+        <body></body>
+      </html>
+    `);
+
+    doc.close();
+
     const head = this.getHead();
     const body = this.getBody();
     const win = this.getWindow();
