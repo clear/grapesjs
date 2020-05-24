@@ -1,5 +1,5 @@
 import Backbone from 'backbone';
-import { isEmpty, each, keys } from 'underscore';
+import { isEmpty, isObject, isArray, each, keys } from 'underscore';
 import Components from '../model/Components';
 import ComponentsView from './ComponentsView';
 import Selectors from 'selector_manager/model/Selectors';
@@ -313,8 +313,12 @@ export default Backbone.View.extend({
       ...model.getAttributes()
     };
 
-    // Remove all `false` attributes
-    keys(attr).forEach(key => attr[key] === false && delete attr[key]);
+    // Remove all `false` attributes. Clear edit: Also remove Objects and Arrays since they need to be added to the DOM reference directly
+    keys(attr).forEach(
+      key =>
+        (attr[key] === false || isObject(attr[key]) || isArray(attr[key])) &&
+        delete attr[key]
+    );
 
     $el.attr(attr);
     this.updateStyle();
