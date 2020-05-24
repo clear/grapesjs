@@ -35288,11 +35288,11 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
       return $el.removeAttr(attr);
     });
 
-    var attr = _objectSpread({}, defaultAttr, {}, model.getAttributes()); // Remove all `false` attributes
+    var attr = _objectSpread({}, defaultAttr, {}, model.getAttributes()); // Remove all `false` attributes. Clear edit: Also remove Objects and Arrays since they need to be added to the DOM reference directly
 
 
     Object(underscore__WEBPACK_IMPORTED_MODULE_2__["keys"])(attr).forEach(function (key) {
-      return attr[key] === false && delete attr[key];
+      return (attr[key] === false || Object(underscore__WEBPACK_IMPORTED_MODULE_2__["isObject"])(attr[key]) || Object(underscore__WEBPACK_IMPORTED_MODULE_2__["isArray"])(attr[key])) && delete attr[key];
     });
     $el.attr(attr);
     this.updateStyle();
@@ -38980,7 +38980,7 @@ var defaultConfig = {
   editors: editors,
   plugins: plugins,
   // Will be replaced on build
-  version: '0.16.14',
+  version: '0.16.13',
 
   /**
    * Initialize the editor with passed options
