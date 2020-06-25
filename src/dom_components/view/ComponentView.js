@@ -313,10 +313,13 @@ export default Backbone.View.extend({
       ...model.getAttributes()
     };
 
-    // Remove all `false` attributes. Clear edit: Also remove Objects and Arrays since they need to be added to the DOM reference directly
+    // Remove all `false` attributes. Clear edit: Also remove Objects, Arrays and attributes containing | since they need to be added to the DOM reference directly
     keys(attr).forEach(
       key =>
-        (attr[key] === false || isObject(attr[key]) || isArray(attr[key])) &&
+        (attr[key] === false ||
+          isObject(attr[key]) ||
+          isArray(attr[key]) ||
+          key.includes('|')) &&
         delete attr[key]
     );
 
