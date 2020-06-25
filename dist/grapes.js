@@ -35288,11 +35288,11 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
       return $el.removeAttr(attr);
     });
 
-    var attr = _objectSpread({}, defaultAttr, {}, model.getAttributes()); // Remove all `false` attributes. Clear edit: Also remove Objects and Arrays since they need to be added to the DOM reference directly
+    var attr = _objectSpread({}, defaultAttr, {}, model.getAttributes()); // Remove all `false` attributes. Clear edit: Also remove Objects, Arrays and attributes containing | since they need to be added to the DOM reference directly
 
 
     Object(underscore__WEBPACK_IMPORTED_MODULE_2__["keys"])(attr).forEach(function (key) {
-      return (attr[key] === false || Object(underscore__WEBPACK_IMPORTED_MODULE_2__["isObject"])(attr[key]) || Object(underscore__WEBPACK_IMPORTED_MODULE_2__["isArray"])(attr[key])) && delete attr[key];
+      return (attr[key] === false || Object(underscore__WEBPACK_IMPORTED_MODULE_2__["isObject"])(attr[key]) || Object(underscore__WEBPACK_IMPORTED_MODULE_2__["isArray"])(attr[key]) || key.includes('|')) && delete attr[key];
     });
     $el.attr(attr);
     this.updateStyle();
