@@ -166,7 +166,9 @@ export default Backbone.View.extend({
       const canvas = this.em.get('Canvas');
       const win = this.getWindow();
       const body = this.getBody();
-      const actualTop = body.scrollTop;
+      // Clear edit: Change scrollTop to fallback to documentElement.scrollTop (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
+      const actualTop =
+        body.scrollTop || this.getDoc().documentElement.scrollTop;
       const clientY = lastClientY || 0;
       const limitTop = canvas.getConfig().autoscrollLimit;
       const limitBottom = this.getRect().height - limitTop;
