@@ -78,9 +78,20 @@ export default Backbone.View.extend({
    */
   offset(el) {
     var rect = el.getBoundingClientRect();
+
+    // Clear edit: Change scrollTop/scrollLeft to fallback to documentElement (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
+    const scrollTop =
+      el.ownerDocument.body.scrollTop ||
+      (el.ownerDocument.documentElement || {}).scrollTop ||
+      0;
+    const scrollLeft =
+      el.ownerDocument.body.scrollLeft ||
+      (el.ownerDocument.documentElement || {}).scrollLeft ||
+      0;
+
     return {
-      top: rect.top + el.ownerDocument.body.scrollTop,
-      left: rect.left + el.ownerDocument.body.scrollLeft
+      top: rect.top + scrollTop,
+      left: rect.left + scrollLeft
     };
   },
 

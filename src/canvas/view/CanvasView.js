@@ -164,9 +164,19 @@ export default Backbone.View.extend({
     const docBody = el.ownerDocument.body;
     const { noScroll } = opts;
 
+    // Clear edit: Change scrollTop/scrollLeft to fallback to documentElement (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
+    const scrollTop =
+      docBody.scrollTop ||
+      (el.ownerDocument.documentElement || {}).scrollTop ||
+      0;
+    const scrollLeft =
+      docBody.scrollLeft ||
+      (el.ownerDocument.documentElement || {}).scrollLeft ||
+      0;
+
     return {
-      top: rect.top + (noScroll ? 0 : docBody.scrollTop),
-      left: rect.left + (noScroll ? 0 : docBody.scrollLeft),
+      top: rect.top + (noScroll ? 0 : scrollTop),
+      left: rect.left + (noScroll ? 0 : scrollLeft),
       width: rect.width,
       height: rect.height
     };
@@ -269,9 +279,17 @@ export default Backbone.View.extend({
     const co = this.getCanvasOffset();
     const { noScroll } = opts;
 
+    // Clear edit: Change scrollTop/scrollLeft to fallback to documentElement (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
+    const scrollTop =
+      (doc.body || {}).scrollTop || (doc.documentElement || {}).scrollTop || 0;
+    const scrollLeft =
+      (doc.body || {}).scrollLeft ||
+      (doc.documentElement || {}).scrollLeft ||
+      0;
+
     return {
-      top: fo.top + (noScroll ? 0 : bEl.scrollTop) * zoom - co.top,
-      left: fo.left + (noScroll ? 0 : bEl.scrollLeft) * zoom - co.left,
+      top: fo.top + (noScroll ? 0 : scrollTop) * zoom - co.top,
+      left: fo.left + (noScroll ? 0 : scrollLeft) * zoom - co.left,
       width: co.width,
       height: co.height
     };

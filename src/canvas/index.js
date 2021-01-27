@@ -419,7 +419,17 @@ export default () => {
         const { offsetTop = 0, offsetLeft = 0 } = opts.offset
           ? getFrameElFromDoc(doc)
           : {};
-        const { scrollTop = 0, scrollLeft = 0 } = doc.body || {};
+
+        // Clear edit: Change scrollTop/scrollLeft to fallback to documentElement (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
+        const scrollTop =
+          (doc.body || {}).scrollTop ||
+          (doc.documentElement || {}).scrollTop ||
+          0;
+        const scrollLeft =
+          (doc.body || {}).scrollLeft ||
+          (doc.documentElement || {}).scrollLeft ||
+          0;
+
         const scroll = top ? scrollTop : scrollLeft;
         const offset = top ? offsetTop : offsetLeft;
 
