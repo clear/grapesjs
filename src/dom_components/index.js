@@ -344,12 +344,13 @@ export default () => {
         const handleChanges = this.handleChanges.bind(this);
         const handleRemoves = this.handleRemoves.bind(this);
         um.add(coll);
-        [[coll, 'add', handleChanges], [coll, 'remove', handleRemoves]].forEach(
-          els => {
-            em.stopListening(els[0], els[1], els[2]);
-            em.listenTo(els[0], els[1], els[2]);
-          }
-        );
+        [
+          [coll, 'add', handleChanges],
+          [coll, 'remove', handleRemoves]
+        ].forEach(els => {
+          em.stopListening(els[0], els[1], els[2]);
+          em.listenTo(els[0], els[1], els[2]);
+        });
       }
     },
 
@@ -509,6 +510,7 @@ export default () => {
      * @param {string} [component.content=''] String inside component
      * @param {Object} [component.style={}] Style object
      * @param {Object} [component.attributes={}] Attribute object
+     * @param {Object} opt the options object to be used by the [Components.add]{@link getComponents} method
      * @return {Component|Array<Component>} Component/s added
      * @example
      * // Example of a new component with some extra property
@@ -522,8 +524,8 @@ export default () => {
      *   attributes: { title: 'here' }
      * });
      */
-    addComponent(component) {
-      return this.getComponents().add(component);
+    addComponent(component, opt = {}) {
+      return this.getComponents().add(component, opt);
     },
 
     /**
@@ -551,11 +553,12 @@ export default () => {
     /**
      * Set components
      * @param {Object|string} components HTML string or components model
+     * @param {Object} opt the options object to be used by the {@link addComponent} method
      * @return {this}
      * @private
      */
-    setComponents(components) {
-      this.clear().addComponent(components);
+    setComponents(components, opt = {}) {
+      this.clear().addComponent(components, opt);
     },
 
     /**
@@ -731,6 +734,13 @@ export default () => {
 
     allById() {
       return componentsById;
+    },
+
+    destroy() {
+      this.clear();
+      componentView.remove();
+      [c, em, componentsById, component, componentView].forEach(i => (i = {}));
+      this.em = {};
     }
   };
 };

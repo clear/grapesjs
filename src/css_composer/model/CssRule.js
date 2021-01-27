@@ -9,7 +9,7 @@ const { CSS } = window;
 export default Backbone.Model.extend(Styleable).extend({
   defaults: {
     // Css selectors
-    selectors: {},
+    selectors: [],
 
     // Additional string css selectors
     selectorsAdd: '',
@@ -41,20 +41,36 @@ export default Backbone.Model.extend(Styleable).extend({
 
   initialize(c, opt = {}) {
     this.config = c || {};
-    const em = opt.em;
-    let selectors = this.config.selectors || [];
-    this.em = em;
+    this.opt = opt;
+    this.em = opt.em;
+    this.ensureSelectors();
+  },
 
-    if (em) {
-      const sm = em.get('SelectorManager');
-      const slct = [];
-      selectors.forEach(selector => {
-        slct.push(sm.add(selector));
-      });
-      selectors = slct;
+  clone() {
+    const opts = { ...this.opt };
+    const attr = { ...this.attributes };
+    attr.selectors = this.get('selectors').map(s => s.clone());
+    return new this.constructor(attr, opts);
+  },
+
+  ensureSelectors() {
+    const { em } = this;
+    const sm = em && em.get('SelectorManager');
+    const toListen = [this, 'change:selectors', this.ensureSelectors];
+    let sels = this.getSelectors();
+    this.stopListening(...toListen);
+
+    if (sels.models) {
+      sels = [...sels.models];
     }
 
-    this.set('selectors', new Selectors(selectors));
+    if (Array.isArray(sels)) {
+      const res = sels.filter(i => i).map(i => (sm ? sm.add(i) : i));
+      sels = new Selectors(res);
+    }
+
+    this.set('selectors', sels);
+    this.listenTo(...toListen);
   },
 
   /**
