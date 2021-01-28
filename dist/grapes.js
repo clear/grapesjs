@@ -22984,14 +22984,11 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
             _ref$offsetTop = _ref.offsetTop,
             offsetTop = _ref$offsetTop === void 0 ? 0 : _ref$offsetTop,
             _ref$offsetLeft = _ref.offsetLeft,
-            offsetLeft = _ref$offsetLeft === void 0 ? 0 : _ref$offsetLeft;
+            offsetLeft = _ref$offsetLeft === void 0 ? 0 : _ref$offsetLeft; // Clear edit: Change scrollTop/scrollLeft to fallback to documentElement (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
 
-        var _ref2 = doc.body || {},
-            _ref2$scrollTop = _ref2.scrollTop,
-            scrollTop = _ref2$scrollTop === void 0 ? 0 : _ref2$scrollTop,
-            _ref2$scrollLeft = _ref2.scrollLeft,
-            scrollLeft = _ref2$scrollLeft === void 0 ? 0 : _ref2$scrollLeft;
 
+        var scrollTop = (doc.body || {}).scrollTop || (doc.documentElement || {}).scrollTop || 0;
+        var scrollLeft = (doc.body || {}).scrollLeft || (doc.documentElement || {}).scrollLeft || 0;
         var scroll = top ? scrollTop : scrollLeft;
         var offset = top ? offsetTop : offsetLeft; // if (!top) {
         //   console.log('LEFT', { posLeft: pos[side], scroll, offset }, el);
@@ -23662,10 +23659,13 @@ var timerZoom;
     var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     var rect = Object(utils_mixins__WEBPACK_IMPORTED_MODULE_3__["getElRect"])(el);
     var docBody = el.ownerDocument.body;
-    var noScroll = opts.noScroll;
+    var noScroll = opts.noScroll; // Clear edit: Change scrollTop/scrollLeft to fallback to documentElement (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
+
+    var scrollTop = docBody.scrollTop || (el.ownerDocument.documentElement || {}).scrollTop || 0;
+    var scrollLeft = docBody.scrollLeft || (el.ownerDocument.documentElement || {}).scrollLeft || 0;
     return {
-      top: rect.top + (noScroll ? 0 : docBody.scrollTop),
-      left: rect.left + (noScroll ? 0 : docBody.scrollLeft),
+      top: rect.top + (noScroll ? 0 : scrollTop),
+      left: rect.left + (noScroll ? 0 : scrollLeft),
       width: rect.width,
       height: rect.height
     };
@@ -23764,10 +23764,13 @@ var timerZoom;
     var zoom = this.getZoom();
     var fo = this.getFrameOffset();
     var co = this.getCanvasOffset();
-    var noScroll = opts.noScroll;
+    var noScroll = opts.noScroll; // Clear edit: Change scrollTop/scrollLeft to fallback to documentElement (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
+
+    var scrollTop = (doc.body || {}).scrollTop || (doc.documentElement || {}).scrollTop || 0;
+    var scrollLeft = (doc.body || {}).scrollLeft || (doc.documentElement || {}).scrollLeft || 0;
     return {
-      top: fo.top + (noScroll ? 0 : bEl.scrollTop) * zoom - co.top,
-      left: fo.left + (noScroll ? 0 : bEl.scrollLeft) * zoom - co.left,
+      top: fo.top + (noScroll ? 0 : scrollTop) * zoom - co.top,
+      left: fo.left + (noScroll ? 0 : scrollLeft) * zoom - co.left,
       width: co.width,
       height: co.height
     };
@@ -24032,8 +24035,9 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
       var lastClientY = this.lastClientY;
       var canvas = this.em.get('Canvas');
       var win = this.getWindow();
-      var body = this.getBody();
-      var actualTop = body.scrollTop;
+      var body = this.getBody(); // Clear edit: Change scrollTop to fallback to documentElement.scrollTop (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
+
+      var actualTop = body.scrollTop || this.getDoc().documentElement.scrollTop;
       var clientY = lastClientY || 0;
       var limitTop = canvas.getConfig().autoscrollLimit;
       var limitBottom = this.getRect().height - limitTop;
@@ -24130,7 +24134,11 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
     var root = model.get('root');
     var styles = model.get('styles');
     var em = config.em;
-    var doc = this.getDoc();
+    var doc = this.getDoc(); // Clear edit: Inject doctype to force standards mode
+
+    doc.open();
+    doc.write("\n      <!DOCTYPE html>\n      <html>\n        <head></head>\n        <body></body>\n      </html>\n    ");
+    doc.close();
     var head = this.getHead();
     var body = this.getBody();
     var win = this.getWindow();
@@ -26021,10 +26029,13 @@ var $ = backbone__WEBPACK_IMPORTED_MODULE_0___default.a.$;
    * @return {Object}
    */
   offset: function offset(el) {
-    var rect = el.getBoundingClientRect();
+    var rect = el.getBoundingClientRect(); // Clear edit: Change scrollTop/scrollLeft to fallback to documentElement (I think Standards mode might mean the <html> tag now scrolls instead of <body>)
+
+    var scrollTop = el.ownerDocument.body.scrollTop || (el.ownerDocument.documentElement || {}).scrollTop || 0;
+    var scrollLeft = el.ownerDocument.body.scrollLeft || (el.ownerDocument.documentElement || {}).scrollLeft || 0;
     return {
-      top: rect.top + el.ownerDocument.body.scrollTop,
-      left: rect.left + el.ownerDocument.body.scrollLeft
+      top: rect.top + scrollTop,
+      left: rect.left + scrollLeft
     };
   },
 
@@ -35680,11 +35691,11 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
       return $el.removeAttr(attr);
     });
 
-    var attr = _objectSpread({}, defaultAttr, {}, model.getAttributes()); // Remove all `false` attributes
+    var attr = _objectSpread({}, defaultAttr, {}, model.getAttributes()); // Remove all `false` attributes. Clear edit: Also remove Objects, Arrays and attributes containing | since they need to be added to the DOM reference directly
 
 
     Object(underscore__WEBPACK_IMPORTED_MODULE_2__["keys"])(attr).forEach(function (key) {
-      return attr[key] === false && delete attr[key];
+      return (attr[key] === false || Object(underscore__WEBPACK_IMPORTED_MODULE_2__["isObject"])(attr[key]) || Object(underscore__WEBPACK_IMPORTED_MODULE_2__["isArray"])(attr[key]) || key.includes('|')) && delete attr[key];
     });
     $el.attr(attr);
     this.updateStyle();
@@ -39477,7 +39488,7 @@ var defaultConfig = {
   editors: editors,
   plugins: plugins,
   // Will be replaced on build
-  version: '0.16.30',
+  version: '0.16.31',
 
   /**
    * Initialize the editor with passed options
